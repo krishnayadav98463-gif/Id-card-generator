@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Card Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
+        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        
+        #id-card-wrap { display: none; margin-top: 20px; text-align: center; }
+        #actual-card { background: white; border: 3px solid #1a73e8; border-radius: 15px; padding: 20px; width: 280px; margin: auto; position: relative; overflow: hidden; }
+        #actual-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 50px; background: #1a73e8; z-index: 0; }
+        #card-header { position: relative; color: white; z-index: 1; margin-bottom: 15px; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
+        #display-img { width: 110px; height: 110px; border-radius: 50%; border: 4px solid white; object-fit: cover; position: relative; z-index: 1; background: white; }
+        .data { text-align: left; margin: 15px 0; font-size: 15px; line-height: 1.8; color: #333; }
+        #qrcode { display: flex; justify-content: center; margin-top: 10px; border-top: 1px solid #eee; padding-top: 15px; }
+        .download-btn { background: #1a73e8; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="box" id="form-section">
+        <h2>DETAILS</h2>
+        <input type="file" id="imgInput" accept="image/*">
+        <input type="text" id="userName" placeholder="NAME">
+        <input type="number" id="userAge" placeholder="AGE">
+        <input type="text" id="userAddress" placeholder="ADDRESS">
+        <button onclick="generateCard()">SUBMIT</button>
+    </div>
+
+    <div id="id-card-wrap">
+        <div id="actual-card">
+            <div id="card-header">ID CARD</div>
+            <img id="display-img" src="" alt="Photo">
+            <div class="data">
+                <strong>NAME:</strong> <span id="outName"></span><br>
+                <strong>AGE:</strong> <span id="outAge"></span><br>
+                <strong>ADDRESS:</strong> <span id="outAddress"></span>
+            </div>
+            <div id="qrcode"></div>
+        </div>
+        
+        <button class="download-btn" onclick="downloadCard()">DOWNLOAD IMAGE</button>
+        <button onclick="location.reload()" style="background:#6c757d; margin-top:8px; width:100%; padding:10px; color:white; border:none; border-radius:8px;">RESET</button>
+    </div>
+
+    <script>
+        function generateCard() {
+            const name = document.getElementById('userName').value;
+            const age = document.getElementById('userAge').value;
+            const addr = document.getElementById('userAddress').value;
+            const imgFile = document.getElementById('imgInput').files[0];
+
+            if(!name || !age || !addr || !imgFile) {
+                alert("Please fill all details!");
+                return;
+            }
+
+            document.getElementById('outName').innerText = name.toUpperCase();
+            document.getElementById('outAge').innerText = age;
+            document.getElementById('outAddress').innerText = addr.toUpperCase();
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('display-img').src = e.target.result;
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById('qrcode'), {
+                    text: `NAME: ${name}\nAGE: ${age}\nADDRESS: ${addr}`,
+                    width: 90, height: 90
+                });
+                document.getElementById('form-section').style.display = "none";
+                document.getElementById('id-card-wrap').style.display = "block";
+            };
+            reader.readAsDataURL(imgFile);
+        }
+
+        function downloadCard() {
+            const card = document.getElementById('actual-card');
+            html2canvas(card, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'ID-Card.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
