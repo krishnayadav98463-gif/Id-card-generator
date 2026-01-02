@@ -40,6 +40,9 @@
         <label>NAME:</label>
         <input type="text" id="userName" placeholder="Enter Name">
         
+        <label>PHONE NUMBER (For QR Only):</label>
+        <input type="tel" id="userPhone" placeholder="Enter Phone Number">
+        
         <label>AGE:</label>
         <input type="number" id="userAge" placeholder="Enter Age">
         
@@ -66,7 +69,7 @@
                 <strong>AGE:</strong> <span id="outAge"></span><br>
                 <strong>ADDRESS:</strong> <span id="outAddress"></span><br>
                 <strong>STATUS:</strong> <span id="statusIcon" class="status-dot"></span> <span id="outHealthText"></span>
-            </div>
+                </div>
             <div id="qrcode"></div>
         </div>
         
@@ -77,17 +80,18 @@
     <script>
         function generateCard() {
             const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
             const age = document.getElementById('userAge').value;
             const addr = document.getElementById('userAddress').value;
             const health = document.getElementById('userHealth').value;
             const imgFile = document.getElementById('imgInput').files[0];
 
-            if(!name || !age || !addr || !imgFile) {
-                alert("Bhai, saari details bharna zaroori hai!");
+            if(!name || !phone || !age || !addr || !imgFile) {
+                alert("Please fill all details, including phone number!");
                 return;
             }
 
-            // Fill Card Details
+            // Fill Card Details (Display Only)
             document.getElementById('outName').innerText = name.toUpperCase();
             document.getElementById('outAge').innerText = age;
             document.getElementById('outAddress').innerText = addr.toUpperCase();
@@ -109,12 +113,12 @@
             reader.onload = function(e) {
                 document.getElementById('display-img').src = e.target.result;
                 
-                // Create QR Code
+                // Create QR Code (Includes Phone Number)
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById('qrcode'), {
-                    text: `NAME: ${name}\nAGE: ${age}\nADDRESS: ${addr}\nSTATUS: ${healthLabel}`,
-                    width: 80,
-                    height: 80
+                    text: `NAME: ${name}\nPHONE: ${phone}\nAGE: ${age}\nADDRESS: ${addr}\nSTATUS: ${healthLabel}`,
+                    width: 85,
+                    height: 85
                 });
 
                 document.getElementById('form-section').style.display = "none";
@@ -137,4 +141,3 @@
     </script>
 </body>
 </html>
-
