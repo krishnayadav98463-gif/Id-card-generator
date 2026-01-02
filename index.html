@@ -11,15 +11,21 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
         .box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
         h2 { text-align: center; color: #1a73e8; margin-top: 0; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        label { font-size: 13px; color: #666; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
         
+        /* Card Design */
         #id-card-wrap { display: none; margin-top: 20px; text-align: center; }
         #actual-card { background: white; border: 3px solid #1a73e8; border-radius: 15px; padding: 20px; width: 280px; margin: auto; position: relative; overflow: hidden; }
         #actual-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 50px; background: #1a73e8; z-index: 0; }
         #card-header { position: relative; color: white; z-index: 1; margin-bottom: 15px; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
         #display-img { width: 110px; height: 110px; border-radius: 50%; border: 4px solid white; object-fit: cover; position: relative; z-index: 1; background: white; }
-        .data { text-align: left; margin: 15px 0; font-size: 15px; line-height: 1.8; color: #333; }
+        .data { text-align: left; margin: 15px 0; font-size: 14px; line-height: 1.6; color: #333; }
+        
+        /* Health Status Style */
+        .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1); }
+        
         #qrcode { display: flex; justify-content: center; margin-top: 10px; border-top: 1px solid #eee; padding-top: 15px; }
         .download-btn { background: #1a73e8; margin-top: 15px; }
     </style>
@@ -28,21 +34,38 @@
 
     <div class="box" id="form-section">
         <h2>DETAILS</h2>
+        <label>PHOTO:</label>
         <input type="file" id="imgInput" accept="image/*">
-        <input type="text" id="userName" placeholder="NAME">
-        <input type="number" id="userAge" placeholder="AGE">
-        <input type="text" id="userAddress" placeholder="ADDRESS">
-        <button onclick="generateCard()">SUBMIT</button>
+        
+        <label>NAME:</label>
+        <input type="text" id="userName" placeholder="Enter Name">
+        
+        <label>AGE:</label>
+        <input type="number" id="userAge" placeholder="Enter Age">
+        
+        <label>ADDRESS:</label>
+        <input type="text" id="userAddress" placeholder="Enter Address">
+        
+        <label>HEALTH STATUS:</label>
+        <select id="userHealth">
+            <option value="green">Vaccinated (Green)</option>
+            <option value="red">Not Vaccinated (Red)</option>
+            <option value="black">Disease/Health Issue (Black)</option>
+            <option value="blue">Vaccine Due (Blue)</option>
+        </select>
+        
+        <button onclick="generateCard()">GENERATE ID CARD</button>
     </div>
 
     <div id="id-card-wrap">
         <div id="actual-card">
             <div id="card-header">ID CARD</div>
-            <img id="display-img" src="" alt="Photo">
+            <img id="display-img" src="" alt="Profile Photo">
             <div class="data">
                 <strong>NAME:</strong> <span id="outName"></span><br>
                 <strong>AGE:</strong> <span id="outAge"></span><br>
-                <strong>ADDRESS:</strong> <span id="outAddress"></span>
+                <strong>ADDRESS:</strong> <span id="outAddress"></span><br>
+                <strong>STATUS:</strong> <span id="statusIcon" class="status-dot"></span> <span id="outHealthText"></span>
             </div>
             <div id="qrcode"></div>
         </div>
@@ -56,25 +79,44 @@
             const name = document.getElementById('userName').value;
             const age = document.getElementById('userAge').value;
             const addr = document.getElementById('userAddress').value;
+            const health = document.getElementById('userHealth').value;
             const imgFile = document.getElementById('imgInput').files[0];
 
             if(!name || !age || !addr || !imgFile) {
-                alert("Please fill all details!");
+                alert("Bhai, saari details bharna zaroori hai!");
                 return;
             }
 
+            // Fill Card Details
             document.getElementById('outName').innerText = name.toUpperCase();
             document.getElementById('outAge').innerText = age;
             document.getElementById('outAddress').innerText = addr.toUpperCase();
 
+            // Set Health Color and Text
+            const dot = document.getElementById('statusIcon');
+            const statusText = document.getElementById('outHealthText');
+            dot.style.backgroundColor = health;
+            
+            let healthLabel = "";
+            if(health === 'green') healthLabel = "Vaccinated";
+            else if(health === 'red') healthLabel = "Not Vaccinated";
+            else if(health === 'black') healthLabel = "Medical Issue";
+            else if(health === 'blue') healthLabel = "Vaccine Due";
+            statusText.innerText = healthLabel;
+
+            // Load Image
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('display-img').src = e.target.result;
+                
+                // Create QR Code
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById('qrcode'), {
-                    text: `NAME: ${name}\nAGE: ${age}\nADDRESS: ${addr}`,
-                    width: 90, height: 90
+                    text: `NAME: ${name}\nAGE: ${age}\nADDRESS: ${addr}\nSTATUS: ${healthLabel}`,
+                    width: 80,
+                    height: 80
                 });
+
                 document.getElementById('form-section').style.display = "none";
                 document.getElementById('id-card-wrap').style.display = "block";
             };
@@ -83,13 +125,16 @@
 
         function downloadCard() {
             const card = document.getElementById('actual-card');
-            html2canvas(card, { scale: 2 }).then(canvas => {
+            html2canvas(card, { scale: 3, useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'ID-Card.png';
                 link.href = canvas.toDataURL("image/png");
+                document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
             });
         }
     </script>
 </body>
 </html>
+
