@@ -3,186 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro ID Generator</title>
+    <title>PetID Pro | Digital Dog ID</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Montserrat:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+
+        :root { --primary: #3b82f6; --bg: #0f172a; }
 
         body {
-            margin: 0; padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            background: #0f172a;
-            color: white;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding: 20px;
+            margin: 0; padding: 20px; font-family: 'Montserrat', sans-serif;
+            background: var(--bg); color: white;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
-        /* Glassmorphism Container */
         .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px; border-radius: 20px;
-            width: 100%; max-width: 360px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 20px;
+            width: 100%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        h2 { font-family: 'Syncopate', sans-serif; text-align: center; font-size: 18px; color: #60a5fa; margin-bottom: 20px; }
+        h1 { text-align: center; font-size: 22px; font-weight: 800; color: #60a5fa; margin-bottom: 20px; }
 
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; }
+        
         input, select {
-            width: 100%; padding: 12px; margin: 8px 0;
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px; color: white; box-sizing: border-box; outline: none;
+            width: 100%; padding: 12px; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; outline: none; box-sizing: border-box;
         }
 
         .btn {
-            width: 100%; padding: 14px; margin-top: 10px;
+            width: 100%; padding: 14px; margin-top: 15px; border-radius: 12px;
             background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border: none; border-radius: 10px; color: white;
-            font-weight: 700; cursor: pointer; transition: 0.3s;
+            color: white; border: none; font-weight: 700; cursor: pointer; transition: 0.3s;
         }
 
-        /* Choice Section */
-        #mode-selection { display: none; text-align: center; }
-        .choice-box { display: flex; gap: 15px; margin: 20px 0; }
-        .choice-btn {
-            flex: 1; padding: 15px; background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.2); border-radius: 12px;
-            cursor: pointer; text-align: center;
-        }
-
-        /* ID Card Styling - Fixed Alignment */
-        #id-card-wrap { display: none; text-align: center; width: 100%; }
+        /* --- FIXED ALIGNMENT (IMAGE KI TARAH) --- */
+        #output-screen { display: none; text-align: center; margin-top: 20px; width: 100%; }
         
-        #actual-card {
-            background: white; color: #1e293b; width: 300px; 
-            border-radius: 15px; overflow: hidden; margin: 0 auto;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            padding-bottom: 15px;
+        #id-card {
+            background: white; color: #1e293b; width: 320px; 
+            border-radius: 20px; overflow: hidden; margin: 0 auto;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .card-top { 
-            height: 50px; background: #1e293b; 
+        .card-header { 
+            width: 100%; height: 55px; background: #1e293b; 
             display: flex; align-items: center; justify-content: center; 
-            color: white; font-family: 'Syncopate', sans-serif; font-size: 14px; 
-        }
-        
-        #display-img { 
-            width: 100px; height: 100px; border-radius: 50%; 
-            border: 4px solid #3b82f6; margin: 15px auto; 
-            object-fit: cover; display: block;
-        }
-        
-        .data { 
-            text-align: center; padding: 0 20px; 
-            font-size: 14px; line-height: 1.6; 
-        }
-        .data div { margin-bottom: 5px; }
-        .data strong { color: #3b82f6; font-weight: 700; }
-        
-        #qrcode-box { 
-            margin-top: 15px; display: flex; justify-content: center; 
-            padding: 10px; background: #f1f5f9;
+            color: white; font-weight: 800; font-size: 20px; letter-spacing: 2px;
         }
 
-        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .pet-img-container { margin-top: 25px; position: relative; }
 
-        .qr-only-container { background: white; padding: 20px; border-radius: 15px; display: inline-block; }
+        .pet-img { 
+            width: 130px; height: 130px; border-radius: 50%; 
+            border: 4px solid #3b82f6; object-fit: cover; 
+            background: #cbd5e1;
+        }
+        
+        .card-body { 
+            padding: 20px; text-align: center; width: 100%; box-sizing: border-box;
+        }
+
+        /* Details Styling (Same as your image) */
+        .name-row { font-size: 20px; font-weight: 800; color: #3b82f6; margin-bottom: 10px; }
+        .age-status-row { font-size: 16px; font-weight: 600; color: #475569; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .address-row { font-size: 14px; color: #64748b; line-height: 1.4; padding: 0 10px; }
+
+        .status-dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; }
+
+        #qr-target { 
+            margin: 15px 0 25px 0; 
+            display: flex; justify-content: center;
+        }
+
+        /* Mode Selection */
+        .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .choice-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="container" id="form-section">
-        <h2>ID GENERATOR</h2>
-        <input type="file" id="imgInput" accept="image/*">
-        <input type="text" id="userName" placeholder="NAME">
-        <input type="tel" id="userPhone" placeholder="PHONE (QR ONLY)">
-        <input type="number" id="userAge" placeholder="AGE">
-        <input type="text" id="userAddress" placeholder="ADDRESS">
-        <select id="userHealth">
-            <option value="green">Vaccinated (Green)</option>
-            <option value="red">Not Vaccinated (Red)</option>
-            <option value="black">Disease (Black)</option>
-            <option value="blue">Due (Blue)</option>
-        </select>
-        <button class="btn" onclick="showModes()">NEXT</button>
-    </div>
-
-    <div class="container" id="mode-selection">
-        <h2>FORMAT?</h2>
-        <div class="choice-box">
-            <div class="choice-btn" onclick="generateFinal('full')">🪪 FULL CARD</div>
-            <div class="choice-btn" onclick="generateFinal('qr')">🏁 ONLY QR</div>
+    <div class="container" id="form-screen">
+        <h1>PET ID PRO</h1>
+        <div class="input-group">
+            <label>Upload Photo</label>
+            <input type="file" id="imgInput" accept="image/*">
         </div>
-        <button class="btn" style="background:#475569;" onclick="location.reload()">BACK</button>
+        <div class="input-group">
+            <label>Dog Name</label>
+            <input type="text" id="petName" placeholder="e.g. CARAMEL">
+        </div>
+        <div class="input-group">
+            <label>Age</label>
+            <input type="text" id="petAge" placeholder="e.g. 2.6">
+        </div>
+        <div class="input-group">
+            <label>Address</label>
+            <input type="text" id="petAddr" placeholder="Street, District">
+        </div>
+        <div class="input-group">
+            <label>Owner (For QR)</label>
+            <input type="text" id="ownerName" placeholder="Owner Name">
+        </div>
+        <div class="input-group">
+            <label>Phone (For QR)</label>
+            <input type="tel" id="petPhone" placeholder="Mobile">
+        </div>
+        <div class="input-group">
+            <label>Health Status</label>
+            <select id="petHealth">
+                <option value="green">Vaccinated (Green)</option>
+                <option value="black">Disease (Black)</option>
+                <option value="blue">Due (Blue)</option>
+                <option value="red">Not Vaccinated (Red)</option>
+            </select>
+        </div>
+        <button class="btn" onclick="goToChoice()">NEXT STEP</button>
     </div>
 
-    <div id="id-card-wrap">
-        <div id="actual-card"></div>
-        <button class="btn" onclick="downloadCard()" style="max-width:300px; margin-top:20px;">DOWNLOAD</button>
-        <button class="btn" style="max-width:300px; background:#475569;" onclick="location.reload()">NEW CARD</button>
+    <div class="container" id="choice-screen" style="display:none">
+        <h2 style="text-align:center">CHOOSE FORMAT</h2>
+        <div class="choice-grid">
+            <div class="choice-card" onclick="finalRender('full')">🪪 FULL CARD</div>
+            <div class="choice-card" onclick="finalRender('qr')">🏁 ONLY QR</div>
+        </div>
+        <button class="btn" style="background:#334155" onclick="location.reload()">BACK</button>
+    </div>
+
+    <div id="output-screen">
+        <div id="id-card"></div>
+        <button class="btn" onclick="downloadID()" style="max-width:320px">DOWNLOAD PNG</button>
+        <button class="btn" style="background:#334155; max-width:320px" onclick="location.reload()">CREATE NEW</button>
     </div>
 
     <script>
-        let userData = {};
+        let petData = {};
 
-        function showModes() {
-            userData.name = document.getElementById('userName').value;
-            userData.phone = document.getElementById('userPhone').value;
-            userData.age = document.getElementById('userAge').value;
-            userData.addr = document.getElementById('userAddress').value;
-            userData.health = document.getElementById('userHealth').value;
-            userData.img = document.getElementById('imgInput').files[0];
-
-            if(!userData.name || !userData.img) return alert("Photo aur Name daalein!");
-
-            document.getElementById('form-section').style.display = "none";
-            document.getElementById('mode-selection').style.display = "block";
+        function goToChoice() {
+            petData = {
+                name: document.getElementById('petName').value,
+                age: document.getElementById('petAge').value,
+                addr: document.getElementById('petAddr').value,
+                owner: document.getElementById('ownerName').value,
+                phone: document.getElementById('petPhone').value,
+                health: document.getElementById('petHealth').value,
+                img: document.getElementById('imgInput').files[0]
+            };
+            if(!petData.name || !petData.img) return alert("Photo & Name are required!");
+            document.getElementById('form-screen').style.display = "none";
+            document.getElementById('choice-screen').style.display = "block";
         }
 
-        function generateFinal(mode) {
-            document.getElementById('mode-selection').style.display = "none";
-            const cardInner = document.getElementById('actual-card');
-            
+        function finalRender(type) {
+            document.getElementById('choice-screen').style.display = "none";
+            const card = document.getElementById('id-card');
             const reader = new FileReader();
+            
             reader.onload = function(e) {
-                let healthT = userData.health === 'green' ? "Vaccinated" : userData.health === 'red' ? "No Vax" : userData.health === 'black' ? "Medical" : "Due";
+                let statusTxt = petData.health === 'green' ? 'Vaccinated' : petData.health === 'black' ? 'Disease' : petData.health === 'blue' ? 'Due' : 'Not Vaccinated';
                 
-                if(mode === 'full') {
-                    cardInner.innerHTML = `
-                        <div class="card-top">ID CARD</div>
-                        <img id="display-img" src="${e.target.result}">
-                        <div class="data">
-                            <div><strong>NAME:</strong> ${userData.name.toUpperCase()}</div>
-                            <div><strong>AGE:</strong> ${userData.age} | <span class="status-dot" style="background:${userData.health}"></span>${healthT}</div>
-                            <div><strong>ADDRESS:</strong> ${userData.addr}</div>
+                if(type === 'full') {
+                    card.innerHTML = `
+                        <div class="card-header">ID CARD</div>
+                        <div class="pet-img-container">
+                            <img src="${e.target.result}" class="pet-img">
+                        </div>
+                        <div class="card-body">
+                            <div class="name-row">NAME: ${petData.name.toUpperCase()}</div>
+                            <div class="age-status-row">
+                                AGE: ${petData.age} | <span class="status-dot" style="background:${petData.health}"></span> ${statusTxt}
+                            </div>
+                            <div class="address-row"><strong>ADDRESS:</strong> ${petData.addr}</div>
                         </div>
                         <div id="qr-target"></div>
                     `;
                 } else {
-                    cardInner.style.background = "transparent";
-                    cardInner.style.boxShadow = "none";
-                    cardInner.innerHTML = `<div class="qr-only-container"><div id="qr-target"></div><p style="color:#000; margin-top:10px;">SCAN INFO</p></div>`;
+                    card.innerHTML = `
+                        <div style="padding:30px; background:white; width:100%; display:flex; flex-direction:column; align-items:center;">
+                            <div id="qr-target" style="margin:0"></div>
+                            <h2 style="margin:15px 0 5px 0; color:#1e293b">${petData.name.toUpperCase()}</h2>
+                            <p style="margin:0; color:#64748b; font-size:14px">SCAN FOR OWNER INFO</p>
+                        </div>
+                    `;
                 }
 
                 new QRCode(document.getElementById('qr-target'), {
-                    text: `NAME:${userData.name}\nPHONE:${userData.phone}\nSTATUS:${healthT}`,
-                    width: 120, height: 120
+                    text: `DOG:${petData.name}\nOWNER:${petData.owner}\nPHONE:${petData.phone}\nSTATUS:${statusTxt}`,
+                    width: 140, height: 140
                 });
 
-                document.getElementById('id-card-wrap').style.display = "block";
+                document.getElementById('output-screen').style.display = "block";
             }
-            reader.readAsDataURL(userData.img);
+            reader.readAsDataURL(petData.img);
         }
 
-        function downloadCard() {
-            html2canvas(document.getElementById('actual-card'), { scale: 3 }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'ID_Card.png';
-                link.href = canvas.toDataURL();
-                link.click();
+        function downloadID() {
+            html2canvas(document.getElementById('id-card'), { scale: 3 }).then(canvas => {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL();
+                a.download = 'Pet_ID.png';
+                a.click();
             });
         }
     </script>
